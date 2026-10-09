@@ -27,13 +27,19 @@
   </div>
   <p class="small" data-en="Hours and quality appear about one day after submission. Only client-approved hours are paid." data-fr="Les heures et la qualité apparaissent environ un jour après la soumission. Seules les heures approuvées par le client sont payées."></p>
 
+  <div class="panel" id="slack">
+    <h2 style="margin-top:0" data-en="Join the DJAI Slack" data-fr="Rejoindre le Slack DJAI"></h2>
+    <p class="small" data-en="All contributors join our Slack. Start with #onboarding-process and read the pinned message." data-fr="Tous les contributeurs rejoignent notre Slack. Commencez par #onboarding-process et lisez le message épinglé."></p>
+    <a class="btn primary" style="display:inline-block;width:auto;padding:12px 20px;text-decoration:none" href="https://join.slack.com/t/djaipartnershipllc/shared_invite/zt-4cgu30b93-bD69GZF0~lw9Q~TbGz1lQQ" target="_blank" rel="noopener" data-en="Join Slack" data-fr="Rejoindre Slack"></a>
+  </div>
+
   <div class="panel" id="minute">
     <h2 style="margin-top:0" data-en="Start recording on Minute" data-fr="Commencer à filmer sur Minute"></h2>
     <div class="grid" style="margin-top:10px">
       <div class="stat"><span class="small" data-en="Your DJAI email" data-fr="Votre email DJAI"></span><b id="wEmail" style="font-size:20px;word-break:break-all">—</b></div>
-      <div class="stat"><span class="small" data-en="Organization Code" data-fr="Code de l'organisation"></span><b id="orgCode" style="font-size:24px;letter-spacing:2px">—</b></div>
+      <div class="stat hide" id="orgBox"><span class="small" data-en="Organization Code" data-fr="Code de l'organisation"></span><b id="orgCode" style="font-size:24px;letter-spacing:2px">—</b></div>
     </div>
-    <p id="noEmail" class="small hide" data-en="Save your profile with your full name to receive your DJAI email." data-fr="Enregistrez votre profil avec votre nom complet pour recevoir votre email DJAI."></p>
+    <p id="noEmail" class="small hide" data-en="Fill in and save your profile below to receive your DJAI email and the Organization Code." data-fr="Remplissez et enregistrez votre profil ci-dessous pour recevoir votre email DJAI et le code de l'organisation."></p>
     <ol class="small" style="line-height:1.9;padding-left:20px">
       <li data-en="Download the Minute app on your smartphone." data-fr="Téléchargez l'application Minute sur votre smartphone."></li>
       <li data-en="Create your Minute account with your DJAI email above (not your personal email)." data-fr="Créez votre compte Minute avec votre email DJAI ci-dessus (pas votre email personnel)."></li>
@@ -46,8 +52,11 @@
   </div>
 
   <form id="pf" class="panel">
-    <h2 style="margin-top:0" data-en="Your profile" data-fr="Votre profil"></h2>
-    <div class="row">
+    <div id="pfHead" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px">
+      <h2 style="margin:0"><span data-en="Your profile" data-fr="Votre profil"></span> <span id="pfDone" class="hide" style="color:var(--accent)">✓</span></h2>
+      <span id="pfToggle" class="small" style="white-space:nowrap"></span></div>
+    <div id="pfBody">
+    <div class="row" style="margin-top:14px">
       <div><label data-en="Full name" data-fr="Nom complet"></label><input id="name" required></div>
       <div><label data-en="Phone / WhatsApp" data-fr="Téléphone / WhatsApp"></label><input id="phone" required type="tel" placeholder="+509 ..."></div>
       <div><label data-en="Country" data-fr="Pays"></label><select id="country" required><option value="">—</option><option>Haiti</option><option>Dominican Republic</option><option>United States</option><option>Canada</option><option>France</option><option value="Other">Other / Autre</option></select></div>
@@ -71,6 +80,7 @@
     <p class="small" data-en="Never enter passwords or PIN codes. We only need the details to send you money." data-fr="N'entrez jamais de mot de passe ni de code PIN. Nous avons seulement besoin des informations pour vous envoyer l'argent."></p>
 
     <button class="btn primary" type="submit" data-en="Save profile" data-fr="Enregistrer le profil"></button>
+    </div>
     <p id="msg" class="msg"></p>
   </form>
   <p class="small center"><span data-en="Questions?" data-fr="Des questions ?"></span> <a class="link" href="mailto:contact@jdaipartnership.com">contact@jdaipartnership.com</a></p>
@@ -89,7 +99,12 @@ const PM = {
   wise: [["wsEmail","Wise account email","Email du compte Wise"],["wsName","Full name on Wise","Nom complet sur Wise"]]
 };
 const F = { name:"name", phone:"phone", country:"country", city:"city", langs:"langs", phoneModel:"phone_model", strap:"strap", avail:"avail", env:"env" };
-let data = {}, user = null;
+let data = {}, user = null, pfOpen = true;
+function setPf(open){ pfOpen = open; $("pfBody").classList.toggle("hide", !open);
+  $("pfToggle").textContent = open ? T("Collapse ▲","Réduire ▲") : T("Edit ▼","Modifier ▼"); }
+$("pfHead").onclick = () => setPf(!pfOpen);
+document.addEventListener("langchange", () => setPf(pfOpen));
+const isDone = d => !!(d && d.name && d.phone && d.country && d.city && d.payout && d.payout.method);
 function renderPM(){ const m = (document.querySelector('input[name=pm]:checked')||{}).value; const box = $("pmFields"); const keep = {};
   box.querySelectorAll("input").forEach(i => keep[i.id] = i.value); box.innerHTML = "";
   (PM[m]||[]).forEach(([id,en,fr]) => { const d=document.createElement("div"); d.innerHTML=`<label data-en="${en}" data-fr="${fr}"></label><input id="${id}" required>`; box.appendChild(d);
@@ -109,6 +124,7 @@ document.querySelectorAll('input[name=pm]').forEach(r => r.onchange = renderPM);
   if(x){ $("sSub").textContent = x.submitted_hours ?? 0; $("sApp").textContent = x.approved_hours ?? 0;
     $("sQual").textContent = x.quality!=null ? x.quality + "%" : "—";
     $("sEarn").textContent = "$" + Number(x.earnings_usd||0).toFixed(2); $("sPaid").textContent = "$" + Number(x.paid_usd||0).toFixed(2); }
+  $("pfDone").classList.toggle("hide", !isDone(data)); setPf(!isDone(data));
   loadMinute();
 })();
 $("pf").onsubmit = async e => { e.preventDefault(); if(!user) return;
@@ -118,7 +134,7 @@ $("pf").onsubmit = async e => { e.preventDefault(); if(!user) return;
   const upd = { id:user.id, email:user.email, payout, updated_at:new Date().toISOString() };
   Object.entries(F).forEach(([el,col]) => { const v=$(el).value.trim(); upd[col] = col==="avail" ? (v===""?null:parseInt(v,10)) : v; });
   const { error } = await sb.from("profiles").upsert(upd);
-  if(!error) loadMinute();
+  if(!error){ data = { ...data, ...upd }; $("pfDone").classList.toggle("hide", !isDone(data)); if(isDone(data)) setPf(false); loadMinute(); }
   $("msg").className = "msg " + (error?"err":"ok");
   $("msg").textContent = error ? T("Could not save. Please try again.","Échec de l'enregistrement. Réessayez.") : T("Profile saved. Our team will contact you about next steps.","Profil enregistré. Notre équipe vous contactera pour la suite."); };
 $("out").onclick = async () => { await sb.auth.signOut(); location.href="index.html"; };
@@ -127,10 +143,13 @@ const esc = t => String(t||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",
 let PostalMime = null;
 async function loadMinute(){
   const { data: st } = await sb.from("app_settings").select("value").eq("key","minute_org_code").maybeSingle();
-  if(st) $("orgCode").textContent = st.value;
-  const { data: p } = await sb.from("profiles").select("work_email").eq("id", user.id).maybeSingle();
+  const { data: p } = await sb.from("profiles").select("work_email,name,phone,country,city").eq("id", user.id).maybeSingle();
   const we = p && p.work_email;
-  $("wEmail").textContent = we || "—"; $("noEmail").classList.toggle("hide", !!we);
+  const complete = !!(we && p.name && p.phone && p.country && p.city);
+  $("wEmail").textContent = we || "—";
+  $("orgCode").textContent = complete ? ((st && st.value) || "5PNDPR2S") : "—";
+  $("orgBox").classList.toggle("hide", !complete);
+  $("noEmail").classList.toggle("hide", complete);
   if(we) loadInbox();
 }
 async function loadInbox(){
