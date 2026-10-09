@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reset password – DJ AI Partnership LLC</title><link rel="icon" href="logo.png"><link rel="stylesheet" href="portal.css"></head>
+<body><div class="wrap"><div class="top"><a href="index.html"><img src="logo.png" alt="DJ AI Partnership LLC" class="logo"></a><div class="lang"><button data-l="en" class="on">EN</button><button data-l="fr">FR</button></div></div>
+<h2 data-en="Choose a new password" data-fr="Choisissez un nouveau mot de passe"></h2>
+<form id="f"><label data-en="New password" data-fr="Nouveau mot de passe"></label><input id="pass" type="password" minlength="8" required autocomplete="new-password">
+<button class="btn primary" type="submit" data-en="Save password" data-fr="Enregistrer"></button><p id="msg" class="msg"></p></form></div>
+<script src="i18n.js"></script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase-config.js";
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); const T=(en,fr)=>window.LANG==="fr"?fr:en;
+document.getElementById("f").onsubmit = async e => { e.preventDefault();
+  const { error } = await sb.auth.updateUser({ password: document.getElementById("pass").value });
+  const m=document.getElementById("msg"); m.className="msg "+(error?"err":"ok");
+  m.textContent = error ? T("Link expired. Request a new one.","Lien expiré. Demandez-en un nouveau.") : T("Password updated.","Mot de passe mis à jour.");
+  if(!error) setTimeout(()=>location.href="dashboard.html",1200); };
+</script></body></html>

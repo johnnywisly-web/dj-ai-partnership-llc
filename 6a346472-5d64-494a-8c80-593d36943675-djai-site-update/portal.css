@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{--bg:#0b0e14;--card:#121722;--line:#2a3140;--ink:#eef1f5;--muted:#a3abb9;--accent:#b9c9a7;--violet:#7357ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:64px 64px;color:var(--ink);font-family:"DM Sans",sans-serif;line-height:1.55}
+.wrap{max-width:560px;margin:0 auto;padding:28px 22px 60px}.wide{max-width:980px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}.logo{height:46px;background:#fff;border-radius:10px;padding:4px 8px}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.lang button{background:transparent;color:var(--muted);border:0;padding:7px 14px;font:700 13px "DM Sans";cursor:pointer}.lang button.on{background:var(--ink);color:var(--bg)}
+.eyebrow{font-size:13px;letter-spacing:4px;color:var(--accent);font-weight:700;margin:0}
+h1{font-family:"Space Grotesk";font-size:clamp(38px,9vw,58px);line-height:1.04;letter-spacing:-1.5px;margin:14px 0}h1 em{font-style:normal;color:var(--accent)}
+h2{font-family:"Space Grotesk";font-size:28px;margin:30px 0 6px}h3{margin:0 0 8px;font-size:17px}
+.lead{color:var(--muted);font-size:19px}.small{color:var(--muted);font-size:14px}.center{text-align:center;margin-top:26px}
+.tabs{display:flex;gap:6px;margin-top:30px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px}.tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:10px;border-radius:10px;font:700 15px "DM Sans";cursor:pointer}.tabs button.on{background:#232a3a;color:var(--ink)}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;border-radius:14px;font:600 17px "DM Sans";cursor:pointer;border:1px solid var(--line);margin-top:14px;text-decoration:none}
+.google{background:#05070b;color:var(--ink)}.primary{background:var(--accent);color:#0b0e14;border:0;margin-top:22px}.primary:hover{filter:brightness(1.08)}.ghost{background:transparent;color:var(--ink)}
+.or{display:flex;align-items:center;gap:14px;color:var(--muted);letter-spacing:3px;font-size:13px;margin:26px 0 8px}.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+label{display:block;font-weight:600;margin:16px 0 8px}input,select,textarea{width:100%;background:#080b11;border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:15px 16px;font:16px "DM Sans"}input:focus,select:focus{outline:2px solid var(--accent);border-color:transparent}
+.pw{position:relative}.pw button{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer}
+.ref{display:inline-block;color:var(--accent);font-weight:700;margin:16px 0 4px;text-decoration:none}.chk{display:flex;gap:12px;font-weight:400;color:var(--muted);font-size:14px}.chk input{width:20px;height:20px;flex:none;margin-top:3px}
+.link{color:var(--accent)}.hide{display:none!important}.msg{min-height:20px;font-size:14px;margin-top:12px}.msg.err{color:#ff8a8a}.msg.ok{color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:18px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}.stat b{display:block;font-family:"Space Grotesk";font-size:30px;margin-top:4px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.row{grid-template-columns:1fr}}
+.pay{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:8px}.pay label{margin:0;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;cursor:pointer;font-weight:600}.pay input{display:none}.pay label:has(input:checked){border-color:var(--accent);background:#1a2219;color:var(--accent)}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#232a3a;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:1px}
