@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="DJ AI Partnership LLC — projets payés d’entraînement IA. 4 $ par heure approuvée.">
+<title>DJ AI Partnership — Espace contributeur</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+<!-- INSCRIPTION -->
+<main id="auth">
+  <div class="hero">
+    <div>
+      <p class="eyebrow">PROJETS PAYÉS D’ENTRAÎNEMENT IA</p>
+      <h1>Rejoignez ceux qui entraînent l’IA <em>de demain.</em></h1>
+      <p class="mute" style="font-size:1.1rem;max-width:46ch">Créez un profil DJ AI Partnership pour accéder à des projets payés : annotation de données, contrôle qualité et captures vidéo. 4 $ par heure approuvée, payés en USD.</p>
+      <div class="tiles" aria-hidden="true"><div class="tile a">Captures du quotidien</div><div class="tile b">Annotation</div><div class="tile c">Contrôle qualité</div></div>
+    </div>
+    <div class="formcard">
+      <h2>Créez votre profil DJ AI</h2>
+      <p class="note" style="margin:0 0 6px">Votre adresse prenom@jdaipartnership.com est créée automatiquement.</p>
+      <div class="row">
+        <div><label for="fn">Prénom</label><input id="fn" autocomplete="given-name"></div>
+        <div><label for="ln">Nom</label><input id="ln" autocomplete="family-name"></div>
+      </div>
+      <label for="pe">Email</label><input id="pe" type="email" placeholder="vous@exemple.com" autocomplete="email">
+      <label for="pw">Mot de passe</label>
+      <div class="pw"><input id="pw" type="password" placeholder="Créez un mot de passe (8 caractères min.)" autocomplete="new-password"><button type="button" id="eye" aria-label="Afficher le mot de passe">Voir</button></div>
+      <div class="row">
+        <div><label for="pm">Mode de paiement</label><select id="pm"><option>Transfert bancaire</option><option>Wise</option><option>Payoneer</option></select></div>
+        <div><label for="pd">IBAN, email Wise ou Payoneer</label><input id="pd"></div>
+      </div>
+      <button type="button" class="lnk" id="refbtn">+ Avez-vous un code de parrainage ?</button>
+      <div id="refbox" class="hide"><input id="ref" placeholder="Code de parrainage" autocomplete="off"></div>
+      <label class="chk" for="agree"><input type="checkbox" id="agree"><span>En cochant cette case, je reconnais avoir lu et accepté les conditions d’utilisation et la politique de confidentialité de DJ AI Partnership LLC.</span></label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="wide" id="signup" disabled>Continuer</button>
+      <div class="sep">DÉJÀ INSCRIT ?</div>
+      <label for="le">Votre adresse @jdaipartnership.com</label><input id="le" autocomplete="username">
+      <label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="current-password">
+      <div class="err" id="lerr" role="alert"></div>
+      <button class="ghost wide" id="login">Me connecter</button>
+    </div>
+  </div>
+</main>
+
+<!-- APP -->
+<main id="app" class="hide">
+  <div class="top">
+    <div class="logo">dj ai <i>partnership</i></div>
+    <button class="avatar" id="av" aria-label="Menu du profil" aria-expanded="false"></button>
+    <div class="menu hide" id="menu">
+      <button data-go="profile">Mon profil</button>
+      <button data-go="inbox">Boîte de réception</button>
+      <button data-go="earnings">Paiements</button>
+      <hr>
+      <button id="tc">Tester la connexion</button>
+      <button id="cc2">Vider le cache d’envoi</button>
+      <hr>
+      <button id="logout">Se déconnecter</button>
+    </div>
+  </div>
+  <nav aria-label="Navigation principale">
+    <button data-go="home">Accueil</button><button data-go="projects">Projets</button><button data-go="activity">Activité</button><button data-go="earnings">Revenus</button>
+  </nav>
+  <div class="note" id="toast" role="status"></div>
+
+  <section id="v-home">
+    <h1 id="hello"></h1>
+    <div class="card" id="actcard">
+      <b>Activez votre compte</b>
+      <p class="mute">Entrez le code de la compagnie reçu de DJ AI Partnership pour accéder aux projets.</p>
+      <div class="row"><div><label for="ac">Code de la compagnie</label><input id="ac" autocomplete="off"></div></div>
+      <div class="err" id="acerr" role="alert"></div>
+      <button id="acbtn">Activer</button>
+    </div>
+    <h2>Projets</h2>
+    <div class="card"><button class="ghost" style="width:100%;text-align:left" data-go="projects">DJ AI — Capture égocentrique résidentielle (v1)</button></div>
+    <h2>Revenus</h2>
+    <div class="card">
+      <div class="mute">Solde actuel</div>
+      <div class="flex"><div class="big" id="bal">$0.00</div></div>
+      <div class="inner flex"><div><div class="mute">Pas encore finalisé · net estimé</div><b id="est" style="font-size:1.3rem">$0.00</b></div><span class="pill">estimé</span></div>
+      <div class="ok">Vos informations de paiement sont configurées (<span id="pmh"></span>). Vous êtes prêt à être payé.</div>
+    </div>
+    <div class="card">
+      <b>Récompenses</b>
+      <div class="grid2" style="margin-top:12px">
+        <div class="mini"><span class="mute">Gains de parrainage</span><b>$0.00</b><button class="ghost sm" data-go="earnings" style="margin-top:8px">Voir</button></div>
+        <div class="mini"><span class="mute">Gains de bonus</span><b>$0.00</b><button class="ghost sm" data-go="earnings" style="margin-top:8px">Voir</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-projects" class="hide">
+    <h1>Projets</h1>
+    <div class="card">
+      <b>DJ AI — Capture égocentrique résidentielle (v1)</b>
+      <p class="mute">Tarif : 4 $ par heure approuvée.</p>
+      <div class="row">
+        <div><label for="st">Titre de la tâche</label><input id="st"></div>
+        <div><label for="sm">Durée (minutes)</label><input id="sm" type="number" min="1" max="600"></div>
+      </div>
+      <div class="err" id="serr" role="alert"></div>
+      <button id="submit">Soumettre</button>
+    </div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Date</th><th>Tâche</th><th>Durée</th><th>Gain</th><th>Statut</th><th></th></tr></thead><tbody id="subs"></tbody></table></div>
+    <p class="note" id="nosubs">Aucune soumission pour l’instant.</p>
+    <p class="note">« Approuver » simule la revue d’un administrateur dans ce prototype.</p></div>
+  </section>
+
+  <section id="v-activity" class="hide">
+    <h1>Activité</h1>
+    <div class="card" id="actlist"></div>
+  </section>
+
+  <section id="v-earnings" class="hide">
+    <h1>Revenus</h1>
+    <div class="card">
+      <div class="mute">Solde disponible</div><div class="big" id="bal2">$0.00</div>
+      <p class="mute">Heures approuvées : <b id="hok">0 h</b> · En attente : <b id="hwait">0 h</b></p>
+      <p class="mute">Méthode : <b id="pmv"></b> · Devise : USD</p>
+      <button id="payout">Demander un paiement</button>
+      <div class="err" id="perr" role="alert"></div>
+    </div>
+    <div class="card"><div class="tw"><table><thead><tr><th>Date</th><th>Montant</th><th>Méthode</th><th>Statut</th></tr></thead><tbody id="pays"></tbody></table></div>
+    <p class="note" id="nopays">Aucun paiement pour l’instant.</p></div>
+  </section>
+
+  <section id="v-profile" class="hide">
+    <h1>Mon profil</h1>
+    <div class="card">
+      <p><span class="mute">Nom</span><br><b id="pn"></b></p>
+      <p><span class="mute">Adresse professionnelle</span><br><span class="email" id="myemail"></span></p>
+      <p><span class="mute">Email personnel</span><br><b id="ppe"></b></p>
+      <p><span class="mute">Paiement</span><br><b id="ppm"></b></p>
+    </div>
+  </section>
+
+  <section id="v-inbox" class="hide">
+    <h1>Boîte de réception</h1>
+    <div class="card"><b>Bienvenue chez DJ AI Partnership</b><p class="mute">Soumettez vos tâches dans Projets. Chaque heure approuvée est payée 4 $ en USD.</p></div>
+  </section>
+
+  <a class="domain" href="#" onclick="return false">dj ai partnership</a>
+  <footer>jdaipartnership.com © 2026 · DJ AI Partnership LLC</footer>
+</main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
