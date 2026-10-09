@@ -6,6 +6,7 @@
 <title>Dashboard – DJ AI Partnership LLC</title>
 <link rel="icon" href="logo.png">
 <link rel="stylesheet" href="portal.css">
+<style>.mail{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;background:#080b11}.mail summary{cursor:pointer;font-weight:600}.mail .code{display:inline-block;background:#1a2219;color:var(--accent);font:700 20px "Space Grotesk";letter-spacing:3px;padding:4px 10px;border-radius:8px;margin:6px 0}.mail pre{white-space:pre-wrap;word-break:break-word;font:14px "DM Sans";color:var(--muted);margin:8px 0 0;max-height:260px;overflow:auto}</style>
 </head>
 <body>
 <div class="wrap wide">
@@ -26,6 +27,24 @@
   </div>
   <p class="small" data-en="Hours and quality appear about one day after submission. Only client-approved hours are paid." data-fr="Les heures et la qualité apparaissent environ un jour après la soumission. Seules les heures approuvées par le client sont payées."></p>
 
+  <div class="panel" id="minute">
+    <h2 style="margin-top:0" data-en="Start recording on Minute" data-fr="Commencer à filmer sur Minute"></h2>
+    <div class="grid" style="margin-top:10px">
+      <div class="stat"><span class="small" data-en="Your DJAI email" data-fr="Votre email DJAI"></span><b id="wEmail" style="font-size:20px;word-break:break-all">—</b></div>
+      <div class="stat"><span class="small" data-en="Organization Code" data-fr="Code de l'organisation"></span><b id="orgCode" style="font-size:24px;letter-spacing:2px">—</b></div>
+    </div>
+    <p id="noEmail" class="small hide" data-en="Save your profile with your full name to receive your DJAI email." data-fr="Enregistrez votre profil avec votre nom complet pour recevoir votre email DJAI."></p>
+    <ol class="small" style="line-height:1.9;padding-left:20px">
+      <li data-en="Download the Minute app on your smartphone." data-fr="Téléchargez l'application Minute sur votre smartphone."></li>
+      <li data-en="Create your Minute account with your DJAI email above (not your personal email)." data-fr="Créez votre compte Minute avec votre email DJAI ci-dessus (pas votre email personnel)."></li>
+      <li data-en="Verification codes sent to your DJAI email appear in the inbox below." data-fr="Les codes de vérification envoyés à votre email DJAI apparaissent dans la boîte ci-dessous."></li>
+      <li data-en="Enter the Organization Code, then start recording. Your hours appear here about one day later." data-fr="Entrez le code de l'organisation, puis commencez à filmer. Vos heures apparaissent ici environ un jour plus tard."></li>
+    </ol>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px"><h3 style="margin:0" data-en="DJAI inbox" data-fr="Boîte de réception DJAI"></h3>
+      <button id="inboxRefresh" class="btn ghost" type="button" style="width:auto;margin:0;padding:8px 14px;font-size:14px" data-en="Refresh" data-fr="Actualiser"></button></div>
+    <div id="inbox"><p class="small" data-en="No messages yet." data-fr="Aucun message pour l'instant."></p></div>
+  </div>
+
   <form id="pf" class="panel">
     <h2 style="margin-top:0" data-en="Your profile" data-fr="Votre profil"></h2>
     <div class="row">
@@ -43,6 +62,7 @@
     <h2 data-en="Payout method" data-fr="Moyen de paiement"></h2>
     <div class="pay">
       <label><input type="radio" name="pm" value="moncash">MonCash</label>
+      <label><input type="radio" name="pm" value="natcash">NatCash</label>
       <label><input type="radio" name="pm" value="bank"><span data-en="Bank transfer" data-fr="Virement bancaire"></span></label>
       <label><input type="radio" name="pm" value="payoneer">Payoneer</label>
       <label><input type="radio" name="pm" value="wise">Wise</label>
@@ -63,6 +83,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id), T = (en, fr) => (window.LANG === "fr" ? fr : en);
 const PM = {
   moncash: [["mcName","Name on MonCash account","Nom du compte MonCash"],["mcPhone","MonCash phone number","Numéro MonCash"]],
+  natcash: [["ncName","Name on NatCash account","Nom du compte NatCash"],["ncPhone","NatCash (Natcom) phone number","Numéro NatCash (Natcom)"]],
   bank: [["bkHolder","Account holder name","Titulaire du compte"],["bkName","Bank name","Nom de la banque"],["bkAcct","Account number / IBAN","Numéro de compte / IBAN"],["bkSwift","SWIFT / routing (if any)","SWIFT / code (si applicable)"],["bkCountry","Bank country","Pays de la banque"]],
   payoneer: [["poEmail","Payoneer account email","Email du compte Payoneer"]],
   wise: [["wsEmail","Wise account email","Email du compte Wise"],["wsName","Full name on Wise","Nom complet sur Wise"]]
@@ -88,6 +109,7 @@ document.querySelectorAll('input[name=pm]').forEach(r => r.onchange = renderPM);
   if(x){ $("sSub").textContent = x.submitted_hours ?? 0; $("sApp").textContent = x.approved_hours ?? 0;
     $("sQual").textContent = x.quality!=null ? x.quality + "%" : "—";
     $("sEarn").textContent = "$" + Number(x.earnings_usd||0).toFixed(2); $("sPaid").textContent = "$" + Number(x.paid_usd||0).toFixed(2); }
+  loadMinute();
 })();
 $("pf").onsubmit = async e => { e.preventDefault(); if(!user) return;
   const m = (document.querySelector('input[name=pm]:checked')||{}).value;
@@ -96,9 +118,37 @@ $("pf").onsubmit = async e => { e.preventDefault(); if(!user) return;
   const upd = { id:user.id, email:user.email, payout, updated_at:new Date().toISOString() };
   Object.entries(F).forEach(([el,col]) => { const v=$(el).value.trim(); upd[col] = col==="avail" ? (v===""?null:parseInt(v,10)) : v; });
   const { error } = await sb.from("profiles").upsert(upd);
+  if(!error) loadMinute();
   $("msg").className = "msg " + (error?"err":"ok");
   $("msg").textContent = error ? T("Could not save. Please try again.","Échec de l'enregistrement. Réessayez.") : T("Profile saved. Our team will contact you about next steps.","Profil enregistré. Notre équipe vous contactera pour la suite."); };
 $("out").onclick = async () => { await sb.auth.signOut(); location.href="index.html"; };
+
+const esc = t => String(t||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let PostalMime = null;
+async function loadMinute(){
+  const { data: st } = await sb.from("app_settings").select("value").eq("key","minute_org_code").maybeSingle();
+  if(st) $("orgCode").textContent = st.value;
+  const { data: p } = await sb.from("profiles").select("work_email").eq("id", user.id).maybeSingle();
+  const we = p && p.work_email;
+  $("wEmail").textContent = we || "—"; $("noEmail").classList.toggle("hide", !!we);
+  if(we) loadInbox();
+}
+async function loadInbox(){
+  const { data: rows } = await sb.from("inbox").select("id,from_address,subject,raw,received_at").order("received_at",{ascending:false}).limit(20);
+  const box = $("inbox"); if(!rows || !rows.length) return;
+  if(!PostalMime){ try { PostalMime = (await import("https://esm.sh/postal-mime@2")).default; } catch(e){} }
+  box.innerHTML = "";
+  for(const r of rows){
+    let text = "";
+    try { if(PostalMime){ const m = await PostalMime.parse(r.raw); text = m.text || (m.html||"").replace(/<style[\s\S]*?<\/style>/gi,"").replace(/<[^>]+>/g," ").replace(/\s+/g," "); } } catch(e){}
+    if(!text) text = (r.raw||"").split(/\r?\n\r?\n/).slice(1).join("\n").slice(0,3000);
+    const code = ((r.subject + " " + text).match(/\b\d{4,8}\b/)||[])[0];
+    const d = document.createElement("details"); d.className = "mail";
+    d.innerHTML = `<summary>${esc(r.subject||"(no subject)")}</summary><div class="small">${esc(r.from_address)} · ${new Date(r.received_at).toLocaleString()}</div>${code?`<div class="code">${esc(code)}</div>`:""}<pre>${esc(text.slice(0,4000))}</pre>`;
+    box.appendChild(d);
+  }
+}
+$("inboxRefresh").onclick = loadInbox;
 document.addEventListener("langchange", renderPM);
 </script>
 </body>
