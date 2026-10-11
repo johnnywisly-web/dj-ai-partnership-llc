@@ -35,6 +35,14 @@
     <a href="#" id="forgot" class="small link hide" data-en="Forgot password?" data-fr="Mot de passe oublié ?"></a>
     <p id="msg" class="msg"></p>
   </form>
+  <form id="codeF" class="hide">
+    <p class="small" id="codeInfo" data-en="We sent an 8-digit code to your email. Enter it below to activate your account. Check spam if you don't see it." data-fr="Nous avons envoyé un code à 8 chiffres à votre email. Entrez-le ci-dessous pour activer votre compte. Vérifiez les spams si vous ne le voyez pas."></p>
+    <label data-en="Verification code" data-fr="Code de vérification"></label>
+    <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required placeholder="12345678">
+    <button id="codeGo" class="btn primary" type="submit" data-en="Verify and continue" data-fr="Vérifier et continuer"></button>
+    <a href="#" id="resend" class="small link" data-en="Resend code" data-fr="Renvoyer le code"></a>
+    <p id="msg2" class="msg"></p>
+  </form>
   <p class="small center"><span data-en="Are you a business interested in bringing your workforce?" data-fr="Vous êtes une entreprise et voulez apporter votre équipe ?"></span> <a class="link" href="mailto:contact@jdaipartnership.com">contact@jdaipartnership.com</a></p>
 </div>
 <script src="i18n.js"></script>
@@ -52,16 +60,36 @@ function setMode(m){ mode=m; $("tSign").classList.toggle("on",m==="sign"); $("tL
 $("tSign").onclick=()=>setMode("sign"); $("tLog").onclick=()=>setMode("log");
 $("eye").onclick=()=>{ $("pass").type = $("pass").type==="password"?"text":"password"; };
 $("refT").onclick=e=>{ e.preventDefault(); $("ref").classList.toggle("hide"); };
-$("f").onsubmit = async e => { e.preventDefault(); const email=$("email").value.trim(), password=$("pass").value; $("go").disabled=true;
+const TYPOS={"gmial.com":"gmail.com","gmal.com":"gmail.com","gmai.com":"gmail.com","gmail.co":"gmail.com","gmail.con":"gmail.com","gmaill.com":"gmail.com","gnail.com":"gmail.com","gamil.com":"gmail.com","hotmal.com":"hotmail.com","hotmail.co":"hotmail.com","yaho.com":"yahoo.com","yahoo.co":"yahoo.com","outlok.com":"outlook.com","icloud.co":"icloud.com"};
+let pendingEmail="";
+const msg2=(t,ok)=>{ $("msg2").textContent=t; $("msg2").className="msg "+(ok?"ok":"err"); };
+function showCode(email){ pendingEmail=email; $("f").classList.add("hide"); $("tabs").classList.add("hide"); $("codeF").classList.remove("hide");
+  $("formTitle").dataset.en="Verify your email"; $("formTitle").dataset.fr="Vérifiez votre email"; window.applyLang(); $("code").focus(); }
+$("codeF").onsubmit = async e => { e.preventDefault(); const token=$("code").value.replace(/\D/g,""); if(token.length<6) return msg2(T("Enter the code from the email.","Entrez le code reçu par email."));
+  $("codeGo").disabled=true;
+  try{ const { data, error } = await sb.auth.verifyOtp({ email:pendingEmail, token, type:"signup" }); if(error) throw error;
+    if(data.user) await sb.from("profiles").upsert({ id:data.user.id, email:pendingEmail, referral:$("ref").value.trim()||null });
+    location.href="dashboard.html";
+  } catch(err){ msg2(T("Wrong or expired code. Check it or tap Resend code.","Code incorrect ou expiré. Vérifiez-le ou touchez Renvoyer le code.")); }
+  finally{ $("codeGo").disabled=false; } };
+$("resend").onclick = async e => { e.preventDefault(); const { error } = await sb.auth.resend({ type:"signup", email:pendingEmail });
+  msg2(error?T("Please wait a minute before asking for a new code.","Attendez une minute avant de redemander un code."):T("New code sent.","Nouveau code envoyé."), !error); };
+$("f").onsubmit = async e => { e.preventDefault(); const email=$("email").value.trim().toLowerCase(), password=$("pass").value;
+  const dom=email.split("@")[1]||""; if(!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(email)) return msg(T("Enter a valid email address.","Entrez une adresse email valide."));
+  if(TYPOS[dom]) return msg(T("Did you mean @"+TYPOS[dom]+"? Please fix your email.","Vouliez-vous dire @"+TYPOS[dom]+" ? Corrigez votre email."));
+  if(dom==="jdaipartnership.com") return msg(T("Use your personal email, not a DJAI email.","Utilisez votre email personnel, pas un email DJAI."));
+  $("go").disabled=true;
   try{
     if(mode==="sign"){
       if(!$("agree").checked){ msg(T("Please accept the terms to continue.","Veuillez accepter les conditions pour continuer.")); return; }
       const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ referral:$("ref").value.trim() } } });
       if(error) throw error;
-      if(!data.session){ msg(T("Account created. Check your email to confirm, then log in.","Compte créé. Confirmez via l'email reçu, puis connectez-vous."),true); setMode("log"); return; }
+      if(!data.session){ showCode(email); return; }
       await sb.from("profiles").upsert({ id:data.user.id, email, referral:$("ref").value.trim()||null });
     } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password }); if(error) throw error;
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error && (error.message||"").toLowerCase().includes("not confirmed")){ await sb.auth.resend({ type:"signup", email }); showCode(email); return; }
+      if(error) throw error;
     }
     location.href="dashboard.html";
   } catch(err){ const m=(err.message||"").toLowerCase();
