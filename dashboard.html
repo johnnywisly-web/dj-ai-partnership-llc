@@ -74,12 +74,48 @@
       <li data-en="Do not use a VPN. Follow the instructions shown in the app exactly." data-fr="N'utilisez pas de VPN. Suivez exactement les consignes affichées dans l'app."></li>
       <li data-en="Your hours appear on this dashboard about one day after submission." data-fr="Vos heures apparaissent sur ce tableau de bord environ un jour après la soumission."></li>
     </ul>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px"><h3 style="margin:0" data-en="DJAI inbox" data-fr="Boîte de réception DJAI"></h3>
+
+  </div>
+
+    <div class="panel hide" id="minuteRD">
+    <h2 style="margin-top:0" data-en="Start recording on Minute (Dominican Republic)" data-fr="Commencer à filmer sur Minute (République dominicaine)"></h2>
+    <p data-en="Good news: Minute is now available in the Dominican Republic. Here is how to join the DJAI team on Minute." data-fr="Bonne nouvelle : Minute est maintenant disponible en République dominicaine. Voici comment rejoindre l'équipe DJAI sur Minute."></p>
+    <div class="grid" style="margin-top:10px">
+      <div class="stat"><span class="small" data-en="Your DJAI email" data-fr="Votre email DJAI"></span><b id="wEmailRD" style="font-size:20px;word-break:break-all">—</b></div>
+      <div class="stat hide" id="orgBoxRD"><span class="small" data-en="Company code" data-fr="Code entreprise"></span><b id="orgCodeRD" style="font-size:24px;letter-spacing:2px">—</b></div>
+    </div>
+    <p id="noEmailRD" class="small hide" data-en="Fill in and save your profile below to receive your DJAI email and the company code." data-fr="Remplissez et enregistrez votre profil ci-dessous pour recevoir votre email DJAI et le code entreprise."></p>
+    <h3 data-en="1. Install the app" data-fr="1. Installer l'application"></h3>
+    <ul class="small" style="line-height:1.9;padding-left:20px">
+      <li data-en="Install &quot;Minute Data&quot; (developer Baker Data LLC / Minute). iPhone or Android." data-fr="Installez « Minute Data » (développeur Baker Data LLC / Minute). iPhone ou Android."></li>
+      <li data-en="Eligible phones: iPhone 12 or newer, Google Pixel 6 or newer, Samsung Galaxy S21 or newer." data-fr="Téléphones compatibles : iPhone 12 ou plus récent, Google Pixel 6 ou plus récent, Samsung Galaxy S21 ou plus récent."></li>
+    </ul>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px">
+      <a class="btn primary" style="display:inline-block;width:auto;padding:10px 16px;text-decoration:none" href="https://play.google.com/store/apps/details?id=com.bakerdata.minute" target="_blank" rel="noopener">Android – Google Play</a>
+      <a class="btn ghost" style="display:inline-block;width:auto;padding:10px 16px;text-decoration:none" href="https://apps.apple.com/us/app/minute-data/id6760918280" target="_blank" rel="noopener">iPhone – App Store</a>
+    </div>
+    <h3 data-en="2. Create your account" data-fr="2. Créer votre compte"></h3>
+    <ol class="small" style="line-height:1.9;padding-left:20px">
+      <li data-en="Sign up in Minute with your DJAI email above (never your personal email)." data-fr="Inscrivez-vous sur Minute avec votre email DJAI ci-dessus (jamais votre email personnel)."></li>
+      <li data-en="Any code sent to your DJAI email appears in the DJAI inbox below. Tap Refresh if you don't see it." data-fr="Tout code envoyé à votre email DJAI apparaît dans la boîte DJAI ci-dessous. Touchez Actualiser si vous ne le voyez pas."></li>
+      <li data-en="When the app asks for an organization / company code, enter the company code above." data-fr="Quand l'app demande un code d'organisation / entreprise, entrez le code entreprise ci-dessus."></li>
+    </ol>
+    <h3 data-en="3. Record" data-fr="3. Filmer"></h3>
+    <ul class="small" style="line-height:1.9;padding-left:20px">
+      <li data-en="Wear the phone head mount provided by DJAI. Footage must be first-person and hands-free." data-fr="Portez le support de tête fourni par DJAI. La vidéo doit être à la première personne, mains libres."></li>
+      <li data-en="Record real work only, never padded or staged videos, and choose the exact subcategory (restrooms: Cleaning or Restocking Restrooms; halls: Hall or Common Area Cleaning; gym: Fitness and Recreation)." data-fr="Filmez uniquement du vrai travail, jamais de vidéos rallongées ou mises en scène, et choisissez la sous-catégorie exacte (toilettes : Cleaning or Restocking Restrooms ; couloirs : Hall or Common Area Cleaning ; gym : Fitness and Recreation)."></li>
+      <li data-en="Goal: at least 2 hours per day and 10 hours per week. No VPN." data-fr="Objectif : au moins 2 heures par jour et 10 heures par semaine. Pas de VPN."></li>
+      <li data-en="Your hours appear on this dashboard about one day after approval." data-fr="Vos heures apparaissent sur ce tableau de bord environ un jour après l'approbation."></li>
+    </ul>
+  </div>
+
+  <div class="panel" id="inboxPanel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0"><h3 style="margin:0" data-en="DJAI inbox" data-fr="Boîte de réception DJAI"></h3>
       <button id="inboxRefresh" class="btn ghost" type="button" style="width:auto;margin:0;padding:8px 14px;font-size:14px" data-en="Refresh" data-fr="Actualiser"></button></div>
     <div id="inbox"><p class="small" data-en="No messages yet." data-fr="Aucun message pour l'instant."></p></div>
   </div>
 
-  <form id="pf" class="panel">
+<form id="pf" class="panel">
     <div id="pfHead" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px">
       <h2 style="margin:0"><span data-en="Your profile" data-fr="Votre profil"></span> <span id="pfDone" class="hide" style="color:var(--accent)">✓</span></h2>
       <span id="pfToggle" class="small" style="white-space:nowrap"></span></div>
@@ -174,10 +210,14 @@ async function loadMinute(){
   const { data: p } = await sb.from("profiles").select("work_email,name,phone,country,city").eq("id", user.id).maybeSingle();
   const we = p && p.work_email;
   const complete = !!(we && p.name && p.phone && p.country && p.city);
-  $("wEmail").textContent = we || "—";
-  $("orgCode").textContent = complete ? ((st && st.value) || "5PNDPR2S") : "—";
-  $("orgBox").classList.toggle("hide", !complete);
-  $("noEmail").classList.toggle("hide", complete);
+  const code = complete ? ((st && st.value) || "5PNDPR2S") : "—";
+  const isRD = !!(p && p.country === "Dominican Republic");
+  $("minute").classList.toggle("hide", isRD);
+  $("minuteRD").classList.toggle("hide", !isRD);
+  $("wEmail").textContent = we || "—"; $("wEmailRD").textContent = we || "—";
+  $("orgCode").textContent = code; $("orgCodeRD").textContent = code;
+  $("orgBox").classList.toggle("hide", !complete); $("orgBoxRD").classList.toggle("hide", !complete);
+  $("noEmail").classList.toggle("hide", complete); $("noEmailRD").classList.toggle("hide", complete);
   if(we) loadInbox();
 }
 async function loadInbox(){
