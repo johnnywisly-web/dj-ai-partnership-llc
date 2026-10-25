@@ -60,6 +60,7 @@ function setMode(m){ mode=m; $("tSign").classList.toggle("on",m==="sign"); $("tL
 $("tSign").onclick=()=>setMode("sign"); $("tLog").onclick=()=>setMode("log");
 $("eye").onclick=()=>{ $("pass").type = $("pass").type==="password"?"text":"password"; };
 $("refT").onclick=e=>{ e.preventDefault(); $("ref").classList.toggle("hide"); };
+(()=>{ const q=new URLSearchParams(location.search); const r=(q.get("ref")||q.get("referral")||"").trim(); if(r){ $("ref").value=r; $("ref").classList.remove("hide"); try{localStorage.setItem("djai_ref",r);}catch(e){} } else { try{ const s=localStorage.getItem("djai_ref"); if(s){ $("ref").value=s; $("ref").classList.remove("hide"); } }catch(e){} } })();
 const TYPOS={"gmial.com":"gmail.com","gmal.com":"gmail.com","gmai.com":"gmail.com","gmail.co":"gmail.com","gmail.con":"gmail.com","gmaill.com":"gmail.com","gnail.com":"gmail.com","gamil.com":"gmail.com","hotmal.com":"hotmail.com","hotmail.co":"hotmail.com","yaho.com":"yahoo.com","yahoo.co":"yahoo.com","outlok.com":"outlook.com","icloud.co":"icloud.com"};
 let pendingEmail="";
 const msg2=(t,ok)=>{ $("msg2").textContent=t; $("msg2").className="msg "+(ok?"ok":"err"); };
