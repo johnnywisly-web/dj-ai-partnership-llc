@@ -237,21 +237,30 @@ async function loadMinute(){
   $("noEmail").classList.toggle("hide", complete); $("noEmailRD").classList.toggle("hide", complete);
   if(we) loadInbox();
 }
+const CODE_TTL_MS = 10*60*1000; // sign-in codes disappear after 10 minutes
+const CODE_SUBJ = /code|verif|sign.?in|log.?in|otp|connexion|one.?time|magic/i;
 async function loadInbox(){
-  const { data: rows } = await sb.from("inbox").select("id,from_address,subject,raw,received_at").order("received_at",{ascending:false}).limit(20);
-  const box = $("inbox"); if(!rows || !rows.length) return;
+  const { data: rows } = await sb.from("inbox").select("id,from_address,subject,raw,received_at").order("received_at",{ascending:false}).limit(60);
+  const box = $("inbox"); if(!rows) return;
   if(!PostalMime){ try { PostalMime = (await import("https://esm.sh/postal-mime@2")).default; } catch(e){} }
-  box.innerHTML = "";
+  box.innerHTML = ""; let shown = 0; const now = Date.now();
   for(const r of rows){
+    if(shown >= 20) break;
+    const age = now - new Date(r.received_at).getTime();
+    const old = age > CODE_TTL_MS;
+    if(old && CODE_SUBJ.test(r.subject||"")) continue;
     let text = "";
     try { if(PostalMime){ const m = await PostalMime.parse(r.raw); text = m.text || (m.html||"").replace(/<style[\s\S]*?<\/style>/gi,"").replace(/<[^>]+>/g," ").replace(/\s+/g," "); } } catch(e){}
     if(!text) text = (r.raw||"").split(/\r?\n\r?\n/).slice(1).join("\n").slice(0,3000);
     const code = ((r.subject + " " + text).match(/\b\d{4,8}\b/)||[])[0];
+    if(old && code && /code|verif|otp|sign|connexion|login/i.test(text.slice(0,600))) continue;
     const d = document.createElement("details"); d.className = "mail";
     d.innerHTML = `<summary>${esc(r.subject||"(no subject)")}</summary><div class="small">${esc(r.from_address)} · ${new Date(r.received_at).toLocaleString()}</div>${code?`<div class="code">${esc(code)}</div>`:""}<pre>${esc(text.slice(0,4000))}</pre>`;
-    box.appendChild(d);
+    box.appendChild(d); shown++;
   }
+  if(!shown) box.innerHTML = `<p class="small">${T("No recent messages. Sign-in codes disappear after 10 minutes.","Aucun message récent. Les codes de connexion disparaissent après 10 minutes.")}</p>`;
 }
+setInterval(()=>{ if(typeof user!=="undefined" && user) loadInbox(); }, 60000);
 $("inboxRefresh").onclick = loadInbox;
 document.addEventListener("langchange", renderPM);
 </script>
