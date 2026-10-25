@@ -21,6 +21,8 @@
   <div class="grid">
     <div class="stat"><span class="small" data-en="Hours submitted" data-fr="Heures soumises"></span><b id="sSub">0</b></div>
     <div class="stat"><span class="small" data-en="Hours approved" data-fr="Heures approuvées"></span><b id="sApp">0</b></div>
+    <div class="stat"><span class="small" data-en="Hours rejected" data-fr="Heures rejetées"></span><b id="sRej" style="color:#e5484d">0</b></div>
+    <div class="stat"><span class="small" data-en="Pending review" data-fr="En attente d'examen"></span><b id="sPend">0</b></div>
     <div class="stat"><span class="small" data-en="Quality score" data-fr="Score qualité"></span><b id="sQual">—</b></div>
     <div class="stat"><span class="small" data-en="Earnings (USD)" data-fr="Gains (USD)"></span><b id="sEarn">$0.00</b></div>
     <div class="stat"><span class="small" data-en="Paid out (USD)" data-fr="Déjà payé (USD)"></span><b id="sPaid">$0.00</b></div>
@@ -200,7 +202,7 @@ document.querySelectorAll('input[name=pm]').forEach(r => r.onchange = renderPM);
   $("status").textContent = (data.status||"applicant").toUpperCase();
   if(data.payout && data.payout.method){ const r=document.querySelector(`input[name=pm][value=${data.payout.method}]`); if(r){ r.checked=true; renderPM(); } }
   const { data: x } = await sb.from("stats").select("*").eq("id", user.id).maybeSingle();
-  if(x){ $("sSub").textContent = x.submitted_hours ?? 0; $("sApp").textContent = x.approved_hours ?? 0;
+  if(x){ $("sSub").textContent = x.submitted_hours ?? 0; $("sApp").textContent = x.approved_hours ?? 0; $("sRej").textContent = x.rejected_hours ?? 0; $("sPend").textContent = x.pending_hours ?? 0;
     $("sQual").textContent = x.quality!=null ? x.quality + "%" : "—";
     $("sEarn").textContent = "$" + Number(x.earnings_usd||0).toFixed(2); $("sPaid").textContent = "$" + Number(x.paid_usd||0).toFixed(2); }
   $("pfDone").classList.toggle("hide", !isDone(data)); setPf(!isDone(data));
