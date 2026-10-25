@@ -78,8 +78,8 @@
   </div>
 
     <div class="panel hide" id="minuteRD">
-    <h2 style="margin-top:0" data-en="Start recording on Minute (Dominican Republic)" data-fr="Commencer à filmer sur Minute (République dominicaine)"></h2>
-    <p data-en="Good news: Minute is now available in the Dominican Republic. Here is how to join the DJAI team on Minute." data-fr="Bonne nouvelle : Minute est maintenant disponible en République dominicaine. Voici comment rejoindre l'équipe DJAI sur Minute."></p>
+    <h2 style="margin-top:0" data-en="Start recording on Minute" data-fr="Commencer à filmer sur Minute"></h2>
+    <p data-en="Good news: Minute is available in your country. Here is how to join the DJAI team on Minute." data-fr="Bonne nouvelle : Minute est disponible dans votre pays. Voici comment rejoindre l'équipe DJAI sur Minute."></p>
     <div class="grid" style="margin-top:10px">
       <div class="stat"><span class="small" data-en="Your DJAI email" data-fr="Votre email DJAI"></span><b id="wEmailRD" style="font-size:20px;word-break:break-all">—</b></div>
       <div class="stat hide" id="orgBoxRD"><span class="small" data-en="Company code" data-fr="Code entreprise"></span><b id="orgCodeRD" style="font-size:24px;letter-spacing:2px">—</b></div>
@@ -123,7 +123,7 @@
     <div class="row" style="margin-top:14px">
       <div><label data-en="Full name" data-fr="Nom complet"></label><input id="name" required></div>
       <div><label data-en="Phone / WhatsApp" data-fr="Téléphone / WhatsApp"></label><input id="phone" required type="tel" placeholder="+509 ..."></div>
-      <div><label data-en="Country" data-fr="Pays"></label><select id="country" required><option value="">—</option><option>Haiti</option><option>Dominican Republic</option><option>United States</option><option>Canada</option><option>France</option><option value="Other">Other / Autre</option></select></div>
+      <div><label data-en="Country" data-fr="Pays"></label><select id="country" required><option value="">—</option><option>Haiti</option><option>Dominican Republic</option><option>Brazil</option><option>Venezuela</option><option>Colombia</option><option>United States</option><option>Canada</option><option>France</option><option value="Other">Other / Autre</option></select></div>
       <div><label data-en="City" data-fr="Ville"></label><input id="city" required></div>
       <div><label data-en="Languages" data-fr="Langues"></label><input id="langs" data-ph-en="e.g. Haitian Creole, French, English" data-ph-fr="ex. créole, français, anglais"></div>
       <div><label data-en="Smartphone model" data-fr="Modèle de smartphone"></label><input id="phoneModel" required data-ph-en="iPhone 12+, Galaxy S21+, Pixel 6+" data-ph-fr="iPhone 12+, Galaxy S21+, Pixel 6+"></div>
@@ -211,7 +211,9 @@ async function loadMinute(){
   const we = p && p.work_email;
   const complete = !!(we && p.name && p.phone && p.country && p.city);
   const code = complete ? ((st && st.value) || "5PNDPR2S") : "—";
-  const isRD = !!(p && p.country === "Dominican Republic");
+  const cn = String((p && p.country) || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase();
+  const isRoots = !cn || cn === "haiti" || cn === "ayiti" || cn === "haiti (ayiti)";
+  const isRD = !isRoots; // Minute for every country except Haiti
   $("minute").classList.toggle("hide", isRD);
   $("minuteRD").classList.toggle("hide", !isRD);
   $("wEmail").textContent = we || "—"; $("wEmailRD").textContent = we || "—";
