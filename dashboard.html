@@ -67,7 +67,7 @@
     <h3 data-en="2. Sign in" data-fr="2. Se connecter"></h3>
     <ol class="small" style="line-height:1.9;padding-left:20px">
       <li data-en="Open Roots and enter your DJAI email above (never your personal email)." data-fr="Ouvrez Roots et entrez votre email DJAI ci-dessus (jamais votre email personnel)."></li>
-      <li data-en="The sign-in code sent to your DJAI email appears in the DJAI inbox below. Tap Refresh if you don't see it. The code expires after about 5 minutes." data-fr="Le code de connexion envoyé à votre email DJAI apparaît dans la boîte DJAI ci-dessous. Touchez Actualiser si vous ne le voyez pas. Le code expire après environ 5 minutes."></li>
+      <li data-en="The sign-in code sent to your DJAI email appears in the DJAI inbox below. Tap Refresh if you don't see it. The code stays visible for 10 minutes." data-fr="Le code de connexion envoyé à votre email DJAI apparaît dans la boîte DJAI ci-dessous. Touchez Actualiser si vous ne le voyez pas. Le code reste visible 10 minutes."></li>
       <li data-en="If the app asks for an Organization Code, enter the code above." data-fr="Si l'app demande un code d'organisation, entrez le code ci-dessus."></li>
     </ol>
     <h3 data-en="3. Record" data-fr="3. Filmer"></h3>
@@ -239,30 +239,48 @@ async function loadMinute(){
   $("noEmail").classList.toggle("hide", complete); $("noEmailRD").classList.toggle("hide", complete);
   if(we) loadInbox();
 }
-const CODE_TTL_MS = 10*60*1000; // sign-in codes disappear after 10 minutes
+const CODE_TTL_MS = 10*60*1000; // sign-in codes disappear after 10 minutes (server also purges them)
 const CODE_SUBJ = /code|verif|sign.?in|log.?in|otp|connexion|one.?time|magic/i;
-async function loadInbox(){
-  const { data: rows } = await sb.from("inbox").select("id,from_address,subject,raw,received_at").order("received_at",{ascending:false}).limit(60);
-  const box = $("inbox"); if(!rows) return;
-  if(!PostalMime){ try { PostalMime = (await import("https://esm.sh/postal-mime@2")).default; } catch(e){} }
-  box.innerHTML = ""; let shown = 0; const now = Date.now();
-  for(const r of rows){
-    if(shown >= 20) break;
-    const age = now - new Date(r.received_at).getTime();
-    const old = age > CODE_TTL_MS;
-    if(old && CODE_SUBJ.test(r.subject||"")) continue;
-    let text = "";
-    try { if(PostalMime){ const m = await PostalMime.parse(r.raw); text = m.text || (m.html||"").replace(/<style[\s\S]*?<\/style>/gi,"").replace(/<[^>]+>/g," ").replace(/\s+/g," "); } } catch(e){}
-    if(!text) text = (r.raw||"").split(/\r?\n\r?\n/).slice(1).join("\n").slice(0,3000);
-    const code = ((r.subject + " " + text).match(/\b\d{4,8}\b/)||[])[0];
-    if(old && code && /code|verif|otp|sign|connexion|login/i.test(text.slice(0,600))) continue;
-    const d = document.createElement("details"); d.className = "mail";
-    d.innerHTML = `<summary>${esc(r.subject||"(no subject)")}</summary><div class="small">${esc(r.from_address)} · ${new Date(r.received_at).toLocaleString()}</div>${code?`<div class="code">${esc(code)}</div>`:""}<pre>${esc(text.slice(0,4000))}</pre>`;
-    box.appendChild(d); shown++;
-  }
-  if(!shown) box.innerHTML = `<p class="small">${T("No recent messages. Sign-in codes disappear after 10 minutes.","Aucun message récent. Les codes de connexion disparaissent après 10 minutes.")}</p>`;
+let inboxBusy = false;
+// The server deletes code emails after 10 minutes (pg_cron djai-purge-codes), so the page never hides
+// anything itself: a wrong phone clock can no longer make a fresh code invisible.
+function findCode(subject, text){
+  const hay = (subject||"") + "\n" + (text||"");
+  const near = hay.match(/(?:code|c[oó]digo|otp|verification|v[eé]rification|pin)[^0-9A-Za-z]{0,40}([A-Z0-9]{4,8})\b/i);
+  if(near && /\d/.test(near[1])) return near[1];
+  const six = hay.match(/\b\d{6}\b/); if(six) return six[0];
+  const all = (hay.match(/\b\d{4,8}\b/g)||[]).filter(n => !/^(19|20)\d\d$/.test(n));
+  return all[0] || "";
 }
-setInterval(()=>{ if(typeof user!=="undefined" && user) loadInbox(); }, 60000);
+async function loadInbox(){
+  if(inboxBusy) return; inboxBusy = true;
+  const btn = $("inboxRefresh"); const lbl = btn.textContent; btn.disabled = true; btn.textContent = T("Refreshing…","Actualisation…");
+  try {
+    const { data: rows, error } = await sb.from("inbox").select("id,from_address,subject,raw,received_at").order("received_at",{ascending:false}).limit(60);
+    const box = $("inbox"); if(error || !rows) return;
+    if(!PostalMime){ try { PostalMime = (await import("https://esm.sh/postal-mime@2")).default; } catch(e){} }
+    box.innerHTML = ""; let shown = 0; const now = Date.now();
+    for(const r of rows){
+      if(shown >= 20) break;
+      const age = now - new Date(r.received_at).getTime();
+      const isCodeMail = CODE_SUBJ.test(r.subject||"");
+      let text = "";
+      try { if(PostalMime){ const m = await PostalMime.parse(r.raw); text = m.text || (m.html||"").replace(/<style[\s\S]*?<\/style>/gi,"").replace(/<[^>]+>/g," ").replace(/\s+/g," "); } } catch(e){}
+      if(!text) text = (r.raw||"").split(/\r?\n\r?\n/).slice(1).join("\n").slice(0,3000);
+      const code = findCode(r.subject, text);
+      const looksCode = isCodeMail || (code && /code|verif|otp|sign|connexion|login/i.test(text.slice(0,600)));
+      const left = Math.max(0, Math.ceil((CODE_TTL_MS - age)/60000));
+      const d = document.createElement("details"); d.className = "mail"; if(looksCode && shown===0) d.open = true;
+      d.innerHTML = `<summary>${esc(r.subject||"(no subject)")}</summary><div class="small">${esc(r.from_address)} · ${new Date(r.received_at).toLocaleString()}${looksCode && age>=0 && age<CODE_TTL_MS?` · ${T("disappears in","s'efface dans")} ${left} min`:""}</div>${code?`<div class="code">${esc(code)}</div>`:""}<pre>${esc(text.slice(0,4000))}</pre>`;
+      box.appendChild(d); shown++;
+    }
+    if(!shown) box.innerHTML = `<p class="small">${T("No code yet. Request a new code in Roots, then tap Refresh. Codes disappear after 10 minutes.","Pas encore de code. Demandez un nouveau code dans Roots, puis touchez Actualiser. Les codes s'effacent après 10 minutes.")}</p>`;
+  } finally { inboxBusy = false; btn.disabled = false; btn.textContent = lbl; }
+}
+// Refresh often, and immediately when the person comes back from the Roots app
+setInterval(()=>{ if(typeof user!=="undefined" && user && document.visibilityState==="visible") loadInbox(); }, 15000);
+document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible" && typeof user!=="undefined" && user) loadInbox(); });
+window.addEventListener("pageshow", ()=>{ if(typeof user!=="undefined" && user) loadInbox(); });
 $("inboxRefresh").onclick = loadInbox;
 document.addEventListener("langchange", renderPM);
 </script>
