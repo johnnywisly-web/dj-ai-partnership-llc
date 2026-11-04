@@ -2,20 +2,114 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Apply – DJ AI Partnership LLC</title>
+<meta name="theme-color" content="#050c1f">
 <link rel="icon" href="logo.png">
-<link rel="stylesheet" href="portal.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#050c1f;--ink2:#0a1733;--navy:#0c1f47;--blue:#1d6bff;--cyan:#22c3ff;--violet:#7b5cff;
+  --text:#eaf0fb;--mut:rgba(214,225,247,.72);--line:rgba(255,255,255,.13);--glass:rgba(255,255,255,.055);
+  --r:22px;--grad:linear-gradient(120deg,var(--blue),var(--cyan));
+  --fh:"Sora",Inter,system-ui,sans-serif;--fb:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+html{background:#050c1f}
+body{margin:0;min-height:100vh;font-family:var(--fb);color:var(--text);background:var(--ink);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden;isolation:isolate}
+.bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bg::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:radial-gradient(60% 50% at 85% 0%,rgba(34,195,255,.24),transparent 70%),
+             radial-gradient(50% 60% at 0% 100%,rgba(123,92,255,.26),transparent 70%),
+             radial-gradient(40% 40% at 50% 45%,rgba(29,107,255,.14),transparent 70%)}
+.bg::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+  background-size:56px 56px;-webkit-mask-image:radial-gradient(75% 65% at 50% 35%,#000,transparent);mask-image:radial-gradient(75% 65% at 50% 35%,#000,transparent)}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);z-index:-1;pointer-events:none;animation:float 14s ease-in-out infinite}
+.orb.a{width:340px;height:340px;background:#1d6bff;opacity:.3;top:-90px;right:-70px}
+.orb.b{width:260px;height:260px;background:#7b5cff;opacity:.28;bottom:-60px;left:-80px;animation-delay:-6s}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,40px)}}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+a{color:inherit}
+.hide{display:none!important}
+
+/* header */
+.top{max-width:1160px;margin:0 auto;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;background:#fff;border-radius:14px;padding:4px 10px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.brand img.logo{height:44px;width:96px;object-fit:cover;object-position:50% 48%;display:block}
+.lang{display:flex;padding:4px;gap:2px;border-radius:999px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.lang button{background:transparent;color:var(--mut);border:0;padding:7px 14px;border-radius:999px;font:600 13px var(--fb);cursor:pointer;transition:background .2s,color .2s}
+.lang button.on{background:var(--grad);color:#fff}
+
+/* layout */
+.shell{max-width:1160px;margin:0 auto;padding:18px 20px 56px;display:grid;gap:34px}
+.intro{padding-top:8px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0}
+.eyebrow::before{content:"";width:18px;height:2px;border-radius:2px;background:var(--grad)}
+h1,h2{font-family:var(--fh);letter-spacing:-.02em;margin:0;color:#fff}
+h1{font-size:clamp(36px,6vw,62px);line-height:1.04;font-weight:800;margin:18px 0 16px}
+h1 em{font-style:normal;background:linear-gradient(100deg,#7fd7ff,#ffffff 45%,#9fb8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(16px,1.6vw,18px);color:var(--mut);max-width:520px;margin:0}
+
+/* card */
+.card{position:relative;border-radius:28px;padding:22px 20px 24px;background:linear-gradient(160deg,rgba(255,255,255,.085),rgba(255,255,255,.035));border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 40px 80px -30px rgba(0,0,0,.7),0 0 0 8px rgba(255,255,255,.02)}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(140deg,rgba(34,195,255,.55),transparent 40%,transparent 60%,rgba(123,92,255,.5));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.tabs{display:flex;gap:4px;background:rgba(5,12,31,.55);border:1px solid var(--line);border-radius:999px;padding:5px}
+.tabs button{flex:1;background:transparent;border:0;color:var(--mut);min-height:42px;padding:0 12px;border-radius:999px;font:600 14.5px var(--fb);cursor:pointer;transition:background .25s,color .25s,box-shadow .25s}
+.tabs button:hover{color:#fff}
+.tabs button.on{background:var(--grad);color:#fff;box-shadow:0 8px 22px -8px rgba(29,107,255,.7)}
+h2{font-size:clamp(22px,3vw,27px);line-height:1.2;margin:24px 0 6px}
+.small{color:var(--mut);font-size:14px;margin:0}
+.center{text-align:center;margin:12px 0 0;padding-top:20px;border-top:1px solid var(--line)}
+
+/* fields */
+label{display:block;font-weight:600;font-size:14px;color:#fff;margin:18px 0 8px}
+input,select,textarea{width:100%;background:rgba(5,12,31,.6);border:1px solid rgba(255,255,255,.16);border-radius:14px;color:#fff;padding:14px 16px;font:16px var(--fb);transition:border-color .2s,box-shadow .2s,background .2s;-webkit-appearance:none;appearance:none}
+input::placeholder{color:rgba(214,225,247,.42)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,195,255,.18);background:rgba(5,12,31,.8)}
+input:-webkit-autofill{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0 1000px #0a1733 inset;caret-color:#fff}
+.pw{position:relative}.pw input{padding-right:52px}
+.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:10px;background:transparent;border:0;color:var(--mut);font-size:17px;cursor:pointer}
+.pw button:hover{background:rgba(255,255,255,.08)}
+.ref{display:inline-flex;align-items:center;gap:4px;color:var(--cyan);font-weight:600;font-size:14px;margin:16px 0 4px;text-decoration:none}
+.ref:hover{text-decoration:underline}
+#ref{margin-top:8px}
+.chk{display:flex;gap:12px;align-items:flex-start;font-weight:400;color:var(--mut);font-size:13.5px;line-height:1.55;margin:18px 0 0;padding:14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--line);cursor:pointer}
+.chk input{width:20px;height:20px;flex:none;margin:1px 0 0;padding:0;border-radius:6px;border:1.5px solid rgba(255,255,255,.35);background:transparent;cursor:pointer;display:grid;place-items:center}
+.chk input:checked{background:var(--grad);border-color:transparent}
+.chk input:checked::after{content:"";width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 24px;border-radius:999px;font:600 16px var(--fb);cursor:pointer;border:0;margin-top:22px;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease,filter .25s}
+.primary{background:var(--grad);color:#fff;box-shadow:0 10px 30px -8px rgba(29,107,255,.6)}
+.primary:hover{transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(29,107,255,.7)}
+.primary:disabled{opacity:.6;cursor:wait;transform:none}
+.link{color:var(--cyan);text-decoration:none}.link:hover{text-decoration:underline}
+#forgot,#resend{display:inline-block;margin-top:14px}
+.msg{min-height:20px;font-size:14px;margin:12px 0 0}.msg.err{color:#ff9aa8}.msg.ok{color:#6fe3b4}
+#codeF .small:first-child{margin-top:16px;padding:14px;border-radius:14px;background:rgba(34,195,255,.08);border:1px solid rgba(34,195,255,.25);color:rgba(230,240,255,.85)}
+#code{letter-spacing:.3em;font-size:20px;text-align:center}
+
+@media (min-width:600px){.card{padding:30px 30px 30px}.top{padding:20px 28px}.shell{padding:24px 28px 64px}}
+@media (min-width:960px){
+  .shell{grid-template-columns:1.05fr .95fr;align-items:center;gap:64px;padding-top:48px;min-height:calc(100vh - 100px)}
+  .intro{padding-top:0}
+  .card{padding:34px 36px 32px}
+}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top"><a href="index.html"><img src="logo.png" alt="DJ AI Partnership LLC" class="logo"></a>
-    <div class="lang"><button data-l="en" class="on">EN</button><button data-l="fr">FR</button></div></div>
+<div class="bg" aria-hidden="true"><span class="orb a"></span><span class="orb b"></span></div>
+<header class="top"><a href="index.html" class="brand" aria-label="DJ AI Partnership LLC home"><img src="logo.png" alt="DJ AI Partnership LLC" class="logo"></a>
+  <div class="lang"><button data-l="en" class="on">EN</button><button data-l="fr">FR</button></div></header>
 
+<main class="shell">
+ <section class="intro">
   <p class="eyebrow" data-en="PAID AI TRAINING PROJECTS" data-fr="PROJETS RÉMUNÉRÉS D'ENTRAÎNEMENT IA"></p>
   <h1><span data-en="Join the people" data-fr="Rejoignez ceux qui"></span><br><span data-en="powering " data-fr="font "></span><em data-en="the future of AI." data-fr="avancer l'IA."></em></h1>
   <p class="lead" data-en="Create a DJ AI Partnership profile to be matched with paid real-world video capture and AI data projects." data-fr="Créez votre profil DJ AI Partnership pour être sélectionné sur des projets rémunérés de capture vidéo réelle et de données IA."></p>
+ </section>
 
+ <section class="card">
   <div id="tabs" class="tabs"><button id="tSign" class="on" data-en="Create account" data-fr="Créer un compte"></button><button id="tLog" data-en="Log in" data-fr="Se connecter"></button></div>
 
   <h2 id="formTitle" data-en="Create your DJAI profile" data-fr="Créez votre profil DJAI"></h2>
@@ -44,7 +138,8 @@
     <p id="msg2" class="msg"></p>
   </form>
   <p class="small center"><span data-en="Are you a business interested in bringing your workforce?" data-fr="Vous êtes une entreprise et voulez apporter votre équipe ?"></span> <a class="link" href="mailto:contact@jdaipartnership.com">contact@jdaipartnership.com</a></p>
-</div>
+ </section>
+</main>
 <script src="i18n.js"></script>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
