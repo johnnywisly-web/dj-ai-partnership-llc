@@ -167,6 +167,22 @@
   </form>
   <p class="small center"><span data-en="Questions?" data-fr="Des questions ?"></span> <a class="link" href="mailto:contact@jdaipartnership.com">contact@jdaipartnership.com</a></p>
 </div>
+
+<div id="gate" class="hide" style="position:fixed;inset:0;z-index:50;background:rgba(3,6,12,.92);overflow:auto;padding:24px 16px">
+ <form id="gf" class="panel" style="max-width:520px;margin:6vh auto">
+  <p class="eyebrow" style="margin-top:0" data-en="STEP 2 OF 2" data-fr="ÉTAPE 2 SUR 2"></p>
+  <h2 style="margin-top:4px" data-en="Complete your profile" data-fr="Complétez votre profil"></h2>
+  <p class="small" data-en="1 minute. We need these details to add you to a paid recording project. You can add your payout method later." data-fr="1 minute. Ces informations sont nécessaires pour vous ajouter à un projet rémunéré. Vous pourrez ajouter votre moyen de paiement plus tard."></p>
+  <label data-en="Full name" data-fr="Nom complet"></label><input id="gName" required autocomplete="name">
+  <label data-en="Phone / WhatsApp" data-fr="Téléphone / WhatsApp"></label><input id="gPhone" required type="tel" autocomplete="tel" placeholder="+1 829 ...">
+  <label data-en="Country" data-fr="Pays"></label><select id="gCountry" required></select>
+  <label data-en="City" data-fr="Ville"></label><input id="gCity" required>
+  <label data-en="Smartphone model" data-fr="Modèle de smartphone"></label><input id="gModel" required data-ph-en="e.g. iPhone 13" data-ph-fr="ex. iPhone 13">
+  <label data-en="Do you have a headstrap?" data-fr="Avez-vous un support de tête ?"></label><select id="gStrap" required><option value="">—</option><option value="yes" data-en="Yes" data-fr="Oui"></option><option value="can-get" data-en="I can get one" data-fr="Je peux en obtenir un"></option><option value="no" data-en="No" data-fr="Non"></option></select>
+  <button class="btn primary" type="submit" id="gGo" data-en="Save and open my dashboard" data-fr="Enregistrer et ouvrir mon tableau de bord"></button>
+  <p id="gMsg" class="msg"></p>
+ </form>
+</div>
 <script src="i18n.js"></script>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -207,8 +223,21 @@ document.querySelectorAll('input[name=pm]').forEach(r => r.onchange = renderPM);
     $("sQual").textContent = x.quality!=null ? x.quality + "%" : "—";
     $("sEarn").textContent = "$" + Number(x.earnings_usd||0).toFixed(2); $("sPaid").textContent = "$" + Number(x.paid_usd||0).toFixed(2); }
   $("pfDone").classList.toggle("hide", !isDone(data)); setPf(!isDone(data));
-  loadMinute();
+  if(!hasBasics(data)) openGate(); else loadMinute();
 })();
+const hasBasics = d => !!(d && d.name && d.phone && d.country && d.city && d.phone_model && d.strap);
+function openGate(){ $("gCountry").innerHTML = $("country").innerHTML;
+  [["gName","name"],["gPhone","phone"],["gCountry","country"],["gCity","city"],["gModel","phone_model"],["gStrap","strap"]].forEach(([el,col]) => { if(data[col]) $(el).value = data[col]; });
+  $("gate").classList.remove("hide"); document.body.style.overflow="hidden"; window.applyLang(); }
+$("gf").onsubmit = async e => { e.preventDefault(); if(!user) return; $("gGo").disabled = true;
+  const upd = { id:user.id, email:user.email, name:$("gName").value.trim(), phone:$("gPhone").value.trim(), country:$("gCountry").value,
+    city:$("gCity").value.trim(), phone_model:$("gModel").value.trim(), strap:$("gStrap").value, updated_at:new Date().toISOString() };
+  const { error } = await sb.from("profiles").upsert(upd); $("gGo").disabled = false;
+  if(error){ $("gMsg").className="msg err"; $("gMsg").textContent=T("Could not save. Please try again.","Échec de l'enregistrement. Réessayez."); return; }
+  data = { ...data, ...upd }; Object.entries(F).forEach(([el,col]) => { if(data[col]!=null) $(el).value = data[col]; });
+  $("gate").classList.add("hide"); document.body.style.overflow="";
+  $("msg").className="msg ok"; $("msg").textContent=T("Great! Last step: add your payout method below so we can pay you.","Parfait ! Dernière étape : ajoutez votre moyen de paiement ci-dessous pour être payé.");
+  setPf(true); loadMinute(); $("pf").scrollIntoView({behavior:"smooth"}); };
 $("pf").onsubmit = async e => { e.preventDefault(); if(!user) return;
   const m = (document.querySelector('input[name=pm]:checked')||{}).value;
   if(!m){ $("msg").className="msg err"; $("msg").textContent=T("Choose a payout method.","Choisissez un moyen de paiement."); return; }
