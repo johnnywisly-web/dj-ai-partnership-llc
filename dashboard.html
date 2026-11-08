@@ -257,8 +257,9 @@ async function loadMinute(){
   const { data: p } = await sb.from("profiles").select("work_email,name,phone,country,city").eq("id", user.id).maybeSingle();
   const we = p && p.work_email;
   const complete = !!(we && p.name && p.phone && p.country && p.city);
-  const code = complete ? ((st && st.value) || "5PNDPR2S") : "—";
   const cn = String((p && p.country) || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase();
+  const isUS = ["united states","united states of america","usa","us","u.s.","u.s.a.","etats-unis","etats unis","estados unidos","eeuu","ee.uu."].includes(cn);
+  const code = complete ? (isUS ? "CUGHN6TX" : ((st && st.value) || "5PNDPR2S")) : "—"; // Minute: USA has its own org code
   const isRoots = !cn || cn === "haiti" || cn === "ayiti" || cn === "haiti (ayiti)";
   const isRD = !isRoots; // Minute for every country except Haiti
   $("minute").classList.toggle("hide", isRD);
