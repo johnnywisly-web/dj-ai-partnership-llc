@@ -201,5 +201,6 @@ $("forgot").onclick = async e => { e.preventDefault(); const email=$("email").va
 sb.auth.getSession().then(({data}) => { if(data.session) location.href="dashboard.html"; });
 if(new URLSearchParams(location.search).get("mode")==="login") setMode("log");
 </script>
+<script src="christmas.js" defer></script>
 </body>
 </html>
